@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NCard, NButton, NSpace, NGradientText } from "naive-ui";
+import { RouterLink } from "vue-router"; // 💡 引入 RouterLink
 </script>
 
 <template>
@@ -22,23 +23,37 @@ import { NCard, NButton, NSpace, NGradientText } from "naive-ui";
             justify="center"
             class="actions"
           >
-            <n-button
-              type="primary"
-              size="large"
-              round
-              class="primary-btn"
+            <RouterLink
               to="/games"
+              custom
+              v-slot="{ navigate }"
             >
-              開始探索
-            </n-button>
-            <n-button
-              size="large"
-              round
-              secondary
-              class="secondary-btn"
+              <n-button
+                type="primary"
+                size="large"
+                round
+                class="primary-btn"
+                @click="navigate"
+              >
+                開始探索
+              </n-button>
+            </RouterLink>
+
+            <RouterLink
+              to="/about"
+              custom
+              v-slot="{ navigate }"
             >
-              瞭解更多
-            </n-button>
+              <n-button
+                size="large"
+                round
+                secondary
+                class="secondary-btn"
+                @click="navigate"
+              >
+                瞭解更多
+              </n-button>
+            </RouterLink>
           </n-space>
         </div>
       </n-card>
