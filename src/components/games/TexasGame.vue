@@ -13,7 +13,10 @@
           }"
           :style="{ animationDelay: index * 0.1 + 's' }"
         >
-          {{ phase === "showdown" ? card.suit + card.value : "?" }}
+          <span v-if="phase === 'showdown'" :class="getSuitClass(card.suit)">
+            {{ card.suit }}{{ card.value }}
+          </span>
+          <span v-else class="card-back">?</span>
         </div>
       </div>
     </div>
@@ -25,6 +28,7 @@
           v-for="(card, index) in communityCards"
           :key="index"
           class="card"
+          :class="getSuitClass(card.suit)"
           :style="{ animationDelay: index * 0.1 + 's' }"
         >
           {{ card.suit }}{{ card.value }}
@@ -46,6 +50,7 @@
           v-for="(card, index) in playerHand"
           :key="index"
           class="card"
+          :class="getSuitClass(card.suit)"
           :style="{ animationDelay: index * 0.1 + 's' }"
         >
           {{ card.suit }}{{ card.value }}
@@ -88,13 +93,17 @@
         :class="getResultClass()"
       >
         <div class="result-icon">{{ getResultIcon() }}</div>
-        <h2>{{ gameResult }}</h2>
-        <p class="hand-info">
-          你的牌型: <span class="rank-name">{{ playerHandRank.name }}</span>
-        </p>
-        <p class="hand-info">
-          莊家牌型: <span class="rank-name">{{ opponentHandRank.name }}</span>
-        </p>
+        <h2 class="result-title">{{ gameResult }}</h2>
+        <div class="result-details">
+          <div class="hand-info">
+            <span class="label">你的牌型:</span>
+            <span class="rank-name">{{ playerHandRank.name }}</span>
+          </div>
+          <div class="hand-info">
+            <span class="label">莊家牌型:</span>
+            <span class="rank-name">{{ opponentHandRank.name }}</span>
+          </div>
+        </div>
       </div>
     </transition>
   </div>
@@ -140,6 +149,13 @@ const communityCards = ref<Card[]>([]);
 const phase = ref<"idle" | "preflop" | "flop" | "turn" | "river" | "showdown">(
   "idle",
 );
+
+function getSuitClass(suit: string): string {
+  if (suit === "♥" || suit === "♦") {
+    return "red-suit";
+  }
+  return "black-suit";
+}
 
 function createDeck() {
   const newDeck: Card[] = [];
@@ -330,7 +346,6 @@ function getResultIcon() {
 </script>
 
 <style scoped>
-/* CSS 保持不變 */
 .texas-game {
   display: flex;
   flex-direction: column;
@@ -348,21 +363,36 @@ function getResultIcon() {
 .card {
   width: 55px;
   height: 85px;
-  border: 1px solid #ccc;
+  border: 2px solid #333;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  font-size: 20px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transition: all 0.3s;
   animation: cardAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.card.red-suit {
+  color: #d32f2f;
+}
+
+.card.black-suit {
+  color: #1a1a1a;
 }
 
 .card.hidden {
-  background: linear-gradient(135deg, #2c3e50, #000);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.card.hidden .card-back {
+  color: #2c3e50;
 }
 
 .card.reveal {
@@ -373,52 +403,75 @@ function getResultIcon() {
   background: #f9f9f9;
   color: #ddd;
   border-style: dashed;
+  border-color: #ccc;
 }
 
 .result {
   text-align: center;
-  padding: 20px 40px;
+  padding: 30px 50px;
   border-radius: 12px;
   animation: resultPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .result.win {
-  background: linear-gradient(135deg, #d4edda, #c3f7d2);
-  border: 2px solid #52c41a;
-  box-shadow: 0 0 20px rgba(82, 196, 26, 0.3);
+  background: linear-gradient(135deg, #d4edda 0%, #c3f7d2 100%);
+  border: 3px solid #52c41a;
+  box-shadow: 0 0 30px rgba(82, 196, 26, 0.4), 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .result.lose {
-  background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-  border: 2px solid #f5222d;
-  box-shadow: 0 0 20px rgba(245, 34, 45, 0.3);
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 3px solid #f5222d;
+  box-shadow: 0 0 30px rgba(245, 34, 45, 0.4), 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .result.draw {
-  background: linear-gradient(135deg, #e2e3e5, #d6d8db);
-  border: 2px solid #666;
+  background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+  border: 3px solid #666;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .result-icon {
-  font-size: 40px;
-  margin-bottom: 10px;
+  font-size: 48px;
+  margin-bottom: 15px;
   animation: bounce 0.6s ease infinite;
+  display: inline-block;
 }
 
-.result h2 {
-  margin: 10px 0;
-  font-size: 24px;
+.result-title {
+  margin: 15px 0 20px 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.result-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
 }
 
 .hand-info {
-  font-size: 14px;
-  margin: 5px 0;
-  color: #666;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  color: #333;
+}
+
+.label {
+  font-weight: 600;
+  color: #555;
 }
 
 .rank-name {
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
 @keyframes cardAppear {
@@ -444,11 +497,11 @@ function getResultIcon() {
 @keyframes resultPop {
   0% {
     opacity: 0;
-    transform: scale(0.5);
+    transform: scale(0.5) rotateX(-20deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotateX(0deg);
   }
 }
 
@@ -458,7 +511,7 @@ function getResultIcon() {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
 }
 

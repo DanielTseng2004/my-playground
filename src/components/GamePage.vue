@@ -68,6 +68,22 @@ const gameTabs = [
     color: "#95a5a6",
     component: defineAsyncComponent(() => import("./games/MinesweeperGame.vue")),
   },
+  {
+    key: "gomoku",
+    icon: "⚪",
+    label: "五子棋",
+    desc: "黑白對弈，先連成五子者勝，考驗你的大局觀。",
+    color: "#dcb35c",
+    component: defineAsyncComponent(() => import("./games/GomokuGame.vue")),
+  },
+  {
+    key: "solitaire",
+    icon: "🃏",
+    label: "接龍",
+    desc: "經典撲克牌接龍，考驗你的邏輯與耐心。",
+    color: "#1a5f3f",
+    component: defineAsyncComponent(() => import("./games/SolitaireGame.vue")),
+  },
 ];
 
 const activeTab = ref("puzzle");
